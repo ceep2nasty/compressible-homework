@@ -1,0 +1,68 @@
+T1 = 288 ;
+p1 = 1 ;
+W_s = 680 ;
+gamma = 1.4 ;
+R = 287 ;
+
+
+a1 = sqrt(gamma*R*T1) ;
+M1 = W_s / a1 ;
+
+% define normal shock p2/p1
+
+function p2_p1 = p_NS(M, gamma) 
+    p2_p1 = 1+ 2*gamma * (M^2 - 1)/(gamma+1) ;
+    
+end
+
+% define T2/T1
+
+function T2_T1 = T_ratio(M, gamma)
+    p2_p1 = p_NS(M, gamma) ;
+    gam_term = (gamma+1) / (gamma - 1) ;
+    
+    T2_T1 = p2_p1*((gam_term + p2_p1) / (1 + gam_term*p2_p1)) ;
+end
+
+
+% make u_p a function this time
+
+function u_p = u_particle(M, gamma, a)
+    p2_p1 = p_NS(M, gamma) ;
+    u_p = (a/gamma) * (p2_p1 - 1) * (((2*gamma)/(gamma+1))/(p2_p1 + (gamma-1)/(gamma+1)))^0.5 ;
+end
+
+p2_p1 = p_NS(M1, gamma);
+T2_T1 = T_ratio(M1, gamma) ;
+
+% Part a answers:
+p2 = p1*p2_p1 ;
+T2 = T1 * T2_T1 ;
+u_p = u_particle(M1, gamma, a1) ;
+
+% Part b Mach:
+
+M2 = 0.5774 ; % table result
+a2 = sqrt(gamma*R*T2);
+u_p_2 = -1*(M2*a2-W_s); 
+
+%Part c: total (stagnation) pressure and temperature 
+
+function p0_p = p_tot(M ,gamma)
+    p0_p = (1 + ((gamma-1)*M^2 )/2) ^ (gamma/(gamma-1));
+end
+
+function T0_T = T_tot(M, gamma)
+    T0_T =1 + (((gamma-1)*M^2 )/2) ; 
+end
+
+% Shock frame: M2 = 0.5774
+M2_shock = 0.5774;
+p0_shock = p2 * p_tot(M2_shock, gamma);
+T0_shock = T2 * T_tot(M2_shock, gamma) ;
+
+%Stationary frame: M2 = up/a2
+
+M2_stationary = u_p / a2 ;
+p0_stationary = p2 * p_tot(M2_stationary, gamma);
+T0_stationary = T2 * T_tot(M2_stationary, gamma) ;
